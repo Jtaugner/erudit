@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Эрудит</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Развивайте память и сообразительность!">
+        <meta name="theme-color" content="#ffd99e ">
+        <meta name="apple-mobile-web-app-capable" content="#ffd99e ">
+    <!-- Yandex.Metrika counter -->
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(57224761, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/57224761" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <!-- /Yandex.Metrika counter -->
+        <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="reset.min.css">
+    <link rel="stylesheet" type="text/css" href="index.css">
+        <script src="https://yandex.ru/games/sdk/v2"></script>
+    <link rel="manifest" href="yandex-manifest.json" />
+</head>
+<body translate="no">
+<div class="game none">
+    <div class="start"></div>
+    <div class="property" :class="[content ? 'contentProperty' : '']">
+        <div class="levels mainMenu" v-show="menu">
+            <div class="levelsProperty">
+                <h2 class="levelHead">Эрудит</h2>
+                <div class="forTwoPlayers">
+                    <input type="checkbox" class="checkbox" id="checkbox" v-model="isTwo">
+                    <label for="checkbox">На двоих</label>
+                </div>
+                <div class="levelsNames">
+                    <div class="menuItem" v-show="save" @click="getSave()">Продолжить</div>
+                    <div class="menuItem" @click="start()">Новая игра</div>
+                    <div class="menuItem" @click="toggleDict()">Словарь</div>
+                </div>
+            </div>
+            <div class="openRules" @click="toggleRules()">?</div>
+        </div>
+        <div class="levels" v-show="levels">
+            <div class="levelsProperty">
+                <div class="menu" @click="returnMenu()"></div>
+                <h2 class="levelHead levelHead_big">Сложность</h2>
+                <div class="menuItem" @click="openSizes(0.25)">Легко</div>
+                <div class="menuItem" @click="openSizes(0.5)">Средне</div>
+                <div class="menuItem" @click="openSizes(0.75)">Сложно</div>
+                <div class="menuItem" @click="openSizes(1)">Эксперт</div>
+            </div>
+        </div>
+
+        <div class="levels" v-show="sizes">
+            <div class="levelsProperty">
+                <div class="menu" @click="returnMenu()"></div>
+                <h2 class="levelHead levelHead_big">Размер</h2>
+                <div class="menuItem" @click="startGame(9)">9 x 9</div>
+                <div class="menuItem" @click="startGame(15)">15 x 15</div>
+            </div>
+        </div>
+        <div class="content" v-show="content">
+            <div class="fieldWrapper">
+                <table class="field" :class="[size === 9 ? 'field9' : '']">
+                    <tr class="row" v-for="(row, indexRow) in field">
+                        <td class="cell" v-for="(letter, indexCol) in row"
+                            @click="addLetterToField(indexRow, indexCol)"
+                            :class="[getExtra(indexRow, indexCol, true)]">
+
+                            <template v-show="getExtra(indexRow, indexCol, false)">
+                                <div class="extra">{{getExtra(indexRow, indexCol, false)[0]}}</div>
+                                <div class="extraWord">{{getExtra(indexRow, indexCol, false)[1]}}</div>
+                            </template>
+                            <template v-if="letter !== ''">
+                                <div class="letter"
+                                     :class="[
+                                newLettersIndexes.includes(indexRow + '-' + indexCol) ? 'selectedLetter' : '',
+                                selectedLetterOnField === indexRow + '-' + indexCol ? 'selectedLetterOnField' : '',
+                                newBotLettersIndexes.includes(indexRow + '-' + indexCol) ? 'newBotLetter' : '']">
+                                    {{letter}}
+
+                                    <div class="letterScore">
+                                        {{getLetterScore(letter)}}
+                                    </div>
+                                </div>
+                            </template>
+
+                        </td>
+                    </tr>
+                </table>
+                <div class="blackout" v-show="fieldBlackout || botStroke"></div>
+                <div class="botStroke" v-show="botStroke">Ход противника</div>
+            </div>
+            <div class="blackout" v-show="contentBlackout"></div>
+            <div class="blackout passStrokeBlackout" v-show="passStroke" @click="closePassStroke"></div>
+            <div class="modal passStroke" v-show="passStroke">
+                <h3>Пропустить ход?</h3>
+                <button class="closeEnd" @click="closePassStroke()">Нет</button>
+                <button class="closeEnd" @click="doPassStroke()">Да</button>
+            </div>
+            <div class="modal" v-show="showEndGame">
+                <h2 v-show="!isTwo">{{playerScore > botScore ? 'Вы выиграли!' : playerScore === botScore ? 'Ничья!' : 'Вы проиграли'}}</h2>
+                <h2 v-show="isTwo && botScore === playerScore">Ничья</h2>
+                <h2 v-show="isTwo && botScore !== playerScore">
+                    <span v-if="strokes % 2 === 1 && playerScore > botScore" class="playerScore">Победил игрок #1</span>
+                    <span v-else class="botScore">Победил игрок #2</span>
+
+                </h2>
+                <h3>Счёт <span class="playerScore">{{playerScore}}</span> : <span class="botScore">{{botScore}}</span></h3>
+
+                    <p class="marginBottom" v-show="!isTwo">Всего за игру вы составили {{allMyWords}} слов, использовав {{allMyLetters}}
+                        букв.</p>
+                    <p v-show="!isTwo">Попробуйте побить ваш рекорд!</p>
+
+                    <p class="marginBottom" v-show="isTwo"><span class="playerScore">Игрок #1</span> составил {{getRightWord(allMyWords, true)}},
+                        использовав {{getRightWord(allMyLetters, false)}}.</p>
+                    <p class="marginBottom" v-show="isTwo"><span class="botScore">Игрок #2</span> составил {{getRightWord(allBotWords, true)}},
+                        использовав {{getRightWord(allBotLetters, false)}}.</p>
+
+                <button class="closeEnd" @click="closeEnd()">Продолжить</button>
+            </div>
+            <div class="playerLetters" @click="returnLetter()">
+                <div class="letter"
+                     v-for="(letter, index) in playerLetters"
+                     @click="selectLetter(index)"
+                     :class="[selectedLetters.includes(index) ? 'selectedLetter' : '']"
+                >{{letter}}
+
+                    <div class="letterScore">
+                        {{getLetterScore(letter)}}
+                    </div>
+                </div>
+            </div>
+            <div class="desktopWrapper">
+
+                <div class="buttons desktopAppear">
+                    <div class="change" @click="changeLetters()"></div>
+                    <div class="futureScore">{{futureScore === 0 ? '...' : '+' + futureScore}}</div>
+                    <div class="move" @click="nextLevel()"
+                         :class="newLettersIndexes.length === 0 && !changeMode ? 'timer' : ''"></div>
+                </div>
+                <div class="messages desktopAppear"
+                     :class="[showBadTip ? 'showBadTip' : '', showGoodTip ? 'showGoodTip' : '']">
+                    {{tipMessage}}
+                </div>
+            </div>
+
+            <div class="bottomWrapper">
+                <div class="buttons desktopDisappear">
+                    <div class="change" @click="changeLetters()"></div>
+                    <div class="futureScore">{{futureScore === 0 ? '...' : '+' + futureScore}}</div>
+                    <div class="move" @click="nextLevel()"
+                         :class="newLettersIndexes.length === 0 && !changeMode ? 'timer' : ''"></div>
+                </div>
+                <div class="messages desktopDisappear"
+                     :class="[showBadTip ? 'showBadTip' : '', showGoodTip ? 'showGoodTip' : '']">
+                    {{tipMessage}}
+                </div>
+                <div class="bottomMenu">
+                    <div class="menu" @click="returnMenu()"></div>
+                    <div class="alphabet">
+                        {{allLetters.length}}<img width="35px" height="35px" src="images/alphabet.svg" alt="letters">
+                    </div>
+                    <div class="score">
+                        <span class="playerScore">{{playerScore}}</span>
+                        :
+                        <span class="botScore">{{botScore}}</span></div>
+                    <div class="blackout" v-show="bottomBlackout"></div>
+                </div>
+
+            </div>
+            <div class="playerMessageBlackout blackout" v-show="showPlayerMessage"></div>
+            <div class="playerMessage modal" v-show="showPlayerMessage && isTwo">
+                <p v-if="strokes > 0">Ход окончен. Передайте устройство
+                    <span class="botScore" v-if="strokes % 2 === 1">Игроку #2</span>
+                    <span class="playerScore" v-else="strokes % 2 === 1">Игроку #1</span>
+                </p>
+                <p v-else>
+                    Игра началась. Первый игрок должен взять устройство и нажать "Продолжить".
+                </p>
+
+                <button class="closeEnd" @click="closePlayerMessage()">Продолжить</button>
+            </div>
+        </div>
+    </div>
+    <div class="blackout rulesBlackout" v-show="rules" @click="toggleRules()"></div>
+    <div class="rules" v-show="rules">
+        <h2>Правила</h2>
+        <div class="closeRules" @click="toggleRules()"></div>
+        <p>Добро пожаловать в игру "Эрудит"! Ваша задача - составлять слова,
+            получая как можно больше очков</p>
+        <p>В начале игры в центре поля появляется слово, с помощью которого вам предстоит составлять слова</p>
+        <img src="images/center.png" alt="Поле">
+        <p>А вам выдаётся 7 случайных букв</p>
+        <img src="images/letters.png" alt="Мои буквы">
+        <p>Использовав любые ваши буквы, вам нужно подставить их к уже имеющимся буквам на поле таким
+        образом, чтобы получились готовые слова</p>
+        <img src="images/word.png" alt="Готовое слово">
+        <p>Слова могут быть только существительными, а также читаться лишь слева-направо либо сверху-вниз</p>
+        <img src="images/bigField.png" alt="Готовое слово">
+        <p>На поле не могут появляться несуществующие слова, даже если их можно прочитать с одной стороны</p>
+
+
+        <p>У каждой буквы есть свои очки. Чем сложнее использовать букву, тем больше за неё очков.
+            К примеру, за букву "А" - 1 очко, а за букву "Ю" - целых 9</p>
+        <img src="images/word2.png" alt="Готовое слово">
+        <p>Очки за слово складываются из всех букв слова и добавляются вам,
+            поэтому старайтесь создавать слова с наибольшим количеством очков</p>
+        <p>Также вы увидите на поле раскрашенные ячейки - они помогут вам получить больше очков.
+        К примеру, "2X БУКВА" удваивает количество очков за букву, поставленную в эту ячейку, а "2Х СЛОВО" удваивает очки за всё слово!</p>
+        <p>БОНУС: Использовав все 7 ваших букв, вы получаете дополнительные 15 очков.</p>
+
+        <p>Если вы не можете составить слова, или вас не устраивают ваши буквы, вы можете поменять любые из них, нажав на кнопку стрелочек, или же пропустить ход, нажав на часы.</p>
+        <img src="images/menu.png" alt="Кнопки взаимодействия">
+        <p>Игра заканчивается, если каждый игрок подряд пропустил 3 хода (или менял буквы). Также игра закончится, если закончились все буквы (но это почти невозможно).</p>
+        <p>"Эрудит" помогает развивать логическое мышление, а также расширять словарный запас.</p>
+        <p>Вот и все правила, а теперь пора играть! Удачи!</p>
+    </div>
+
+    <div class="blackout rulesBlackout" v-show="isDict" @click="toggleDict()"></div>
+    <div class="rules dict" v-show="isDict">
+        <h2>Словарь</h2>
+        <div class="closeRules" @click="toggleDict()"></div>
+        <input type="text" class="dict__input" placeholder="Введите слово" v-model="dictInput">
+        <div class="dict__buttons">
+            <button class="dict__button" @click="addWordToAdded">Добавить</button>
+            <button class="dict__button" @click="addWordToDeleted">Удалить</button>
+        </div>
+        <div class="dict__words">
+            <div class="dict__switcher">
+                <div class="dict__switch" :class="[inputAddSelected ? 'dict__selected' : '']" @click="selectInput(true)">Добавленные</div>
+                <div class="dict__switch" :class="[!inputAddSelected ? 'dict__selected' : '']" @click="selectInput(false)">Удалённые</div>
+            </div>
+            <div class="dict__allWords">
+                <div class="dict__word" v-for="word in getDictWords()">
+                    {{word}}
+                    <div class="deleteWord" @click="deleteWord(word)">&#215;</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="vue.min.js"></script>
+<!--<script src="https://jaugr.com/gamesAdditional/words.js"></script>-->
+<script>
+    if(!window.words){
+        console.log('local script');
+        let script = document.createElement('script');
+        script.src = 'words.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+    }
+</script>
+<script src="index.js"></script>
+<script src="sw.js" type="text/javascript"></script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+
+{
+  "icons": [{
+    "src": "manifest-icon.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }],
+  "yandex": {
+    "splash_screen_color": "#ffc06f",
+    "cache": {
+      "resources": [
+        "Ubuntu-Light.ttf",
+"images/alphabet.svg",
+"images/bigField.png",
+"images/book.svg",
+"images/book_animated.svg",
+"images/center.png",
+"images/change.svg",
+"images/cross.svg",
+"images/favicon.png",
+"images/letters.png",
+"images/menu.png",
+"images/menu.svg",
+"images/next.svg",
+"images/timer.svg",
+"images/word.png",
+"images/word2.png",
+"index.css",
+"index.html",
+"index.js",
+"reset.min.css",
+"vue.min.js",
+"words.js"
+      ]
+    }
+  }
+}

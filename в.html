@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="words.js"></script>
+<script>
+    localStorage.setItem('fsdf', JSON.stringify(words.sort(function (a, b) {
+        return a.localeCompare(b);
+    })));
+</script>
+<body>
+
+</body>
+</html>
