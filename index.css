@@ -1408,15 +1408,23 @@ button:active {
     height: 38px;
   }
 }
-@media (min-width: 1200px) and (orientation: landscape) and (max-height: 700px) {
+@media (min-width: 900px) and (orientation: landscape) and (max-height: 700px) {
+  .content {
+    padding-top: 50px;
+  }
+
+  .fieldWrapper {
+    margin: 0 0 0 30px;
+  }
+
   .field {
     width: 80vh;
     height: 80vh;
   }
 
   .cell .letter {
-    font-size: 1.25rem;
-    line-height: 1.25rem;
+    font-size: 1.15rem;
+    line-height: 1.15rem;
   }
 
   .cell .letterScore {
@@ -1428,26 +1436,60 @@ button:active {
     font-size: 0.45rem;
     line-height: 0.45rem;
   }
+
+  .field9 .cell .letter {
+    font-size: 1.6rem;
+    line-height: 1.6rem;
+  }
+
+  .field9 .cell .letterScore {
+    font-size: 0.7rem;
+    line-height: 0.7rem;
+    right: 2px;
+    bottom: 2px;
+  }
+
+  .desktopWrapper {
+    align-items: center;
+  }
+
+  .buttons.desktopAppear {
+    height: 300px;
+  }
+
+  .messages.desktopAppear {
+    height: 200px;
+  }
 }
-@media (min-width: 1200px) and (orientation: landscape) and (max-height: 500px) {
+@media (min-width: 900px) and (orientation: landscape) and (max-height: 500px) {
   .field {
-    width: 70vh;
-    height: 70vh;
+    width: 60vh;
+    height: 60vh;
   }
 
   .cell .letter {
-    font-size: 1rem;
-    line-height: 1rem;
+    font-size: 0.8rem;
+    line-height: 0.8rem;
   }
 
   .cell .letterScore {
-    font-size: 0.45rem;
-    line-height: 0.45rem;
+    font-size: 0.35rem;
+    line-height: 0.35rem;
   }
 
   .cell .extraWord {
-    font-size: 0.35rem;
-    line-height: 0.35rem;
+    font-size: 0.3rem;
+    line-height: 0.3rem;
+  }
+
+  .field9 .cell .letter {
+    font-size: 1.1rem;
+    line-height: 1.1rem;
+  }
+
+  .field9 .cell .letterScore {
+    font-size: 0.5rem;
+    line-height: 0.5rem;
   }
 }
 
