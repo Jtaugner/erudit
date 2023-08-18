@@ -117,9 +117,8 @@ img
 }
 .levels, .allLevels{
   position: relative;
-  width: 100%;
-
-  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   display: flex;
   flex-flow: column nowrap;
   align-content: flex-start;
@@ -234,6 +233,7 @@ img
 }
 .futureScore{
   min-width: 40px;
+  text-align: center;
 
   font-size: 1rem;
   color: #313135;
@@ -871,11 +871,11 @@ img
 }
 @media (min-width: 700px) and (orientation: portrait) {
   .cell .letter {
-    font-size: 1.9rem;
+    font-size: 1.5rem;
   }
   .cell .letterScore{
-    font-size: 1rem;
-    line-height: 1rem;
+    font-size: 0.6rem;
+    line-height: 0.6rem;
     bottom: 3px;
     right: 3px;
   }
@@ -884,8 +884,8 @@ img
     line-height: 0.9rem;
   }
   .extraWord{
-    font-size: 0.7rem;
-    line-height: 0.7rem;
+    font-size: 0.6rem;
+    line-height: 0.6rem;
   }
   .field9 .cell .letter{
     font-size: 2.4rem;
@@ -907,18 +907,19 @@ img
     height: 60px;
   }
   .playerLetters .letter{
-    width: 60px;
-    height: 60px;
-    font-size: 2.5rem;
-    line-height: 2.5rem;
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+    line-height: 2rem;
+    margin: 0 5px;
   }
   .letterScore{
     font-size: 1rem;
     line-height: 1rem;
   }
   .change, .move{
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
   }
   .bottomMenu{
     font-size: 2rem;
@@ -1254,3 +1255,119 @@ button:active{
 .none{
   display: none;
 }
+
+@media (max-height: 650px) and (orientation: portrait){
+  .content{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+  }
+  .field{
+    width: 100vw;
+    height: 100vw;
+  }
+  .change, .move{
+    width: 45px;
+    height: 45px;
+  }
+  .playerLetters{
+    margin-top: 10px;
+    margin-bottom: auto;
+  }
+  .messages{
+    height: 62px;
+    font-size: 0.75rem  ;
+  }
+  .letter{
+    margin: 0 3px;
+    font-size: 1.55rem;
+    line-height: 1.55rem;
+  }
+  .menu{
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 500px){
+  .field{
+    width: 80vw;
+    height: 80vw;
+  }
+}
+@media (orientation: portrait) and (min-width: 700px){
+  .field{
+    width: 70vw;
+    height: 70vw;
+  }
+}
+@media (orientation: portrait) and (min-width: 850px){
+  .field{
+    width: 65vw;
+    height: 65vw;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 900px) and (orientation: landscape) {
+  .field{
+    width: 70vw;
+    height: 70vw;
+  }
+}
+@media (max-height: 530px){
+  .playerLetters{
+    height: 32px;
+  }
+  .playerLetters .letter{
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+  }
+  .playerLetters .letterScore{
+    font-size: 0.57rem;
+    line-height: 0.57rem;
+  }
+  .change, .move{
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (min-width: 1200px) and (orientation: landscape) and (max-height: 700px){
+  .field{
+    width: 80vh;
+    height: 80vh;
+  }
+  .cell .letter {
+    font-size: 1.25rem;
+    line-height: 1.25rem;
+  }
+  .cell .letterScore{
+    font-size: 0.6rem;
+    line-height: 0.6rem;
+  }
+  .cell .extraWord{
+    font-size: 0.45rem;
+    line-height: 0.45rem;
+  }
+}
+@media (min-width: 1200px) and (orientation: landscape) and (max-height: 500px){
+  .field{
+    width: 70vh;
+    height: 70vh;
+  }
+  .cell .letter {
+    font-size: 1rem;
+    line-height: 1rem;
+  }
+  .cell .letterScore{
+    font-size: 0.45rem;
+    line-height: 0.45rem;
+  }
+  .cell .extraWord{
+    font-size: 0.35rem;
+    line-height: 0.35rem;
+  }
+}
+
+//@media (max-height: )

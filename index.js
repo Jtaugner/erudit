@@ -1,5 +1,6 @@
 
 window.onload = function(){
+    let mainWordsCopy = words.slice();
     let advTime = true;
     let showAdv;
     function getFromStorage(name) {
@@ -261,31 +262,35 @@ window.onload = function(){
     let addedWords = getFromStorage("addedWords");
     let deletedWords = getFromStorage("deletedWords");
 
-    function changeWordsWithAddWords(){
-        for(let i = 0; i < addedWords.length; i++){
-            if(!words.includes(addedWords[i])) words.push(addedWords[i]);
-        }
-        sortWords();
-    }
-    function changeWordsWithDeletedWords(){
-        for(let i = 0; i < deletedWords.length; i++){
-            let ind = words.indexOf(deletedWords[i]);
-            if(ind !== -1) words.splice(ind, 1);
-        }
+    function changeWordsDictionary(){
+        try{
+            let newCopy = mainWordsCopy.slice();
+            if(addedWords){
+                for(let i = 0; i < addedWords.length; i++){
+                    if(!newCopy.includes(addedWords[i])) newCopy.push(addedWords[i]);
+                }
+            }
+            if(deletedWords){
+                for(let i = 0; i < deletedWords.length; i++){
+                    let ind = newCopy.indexOf(deletedWords[i]);
+                    if(ind !== -1) newCopy.splice(ind, 1);
+                }
+            }
+            words = newCopy;
+            sortWords();
+        }catch(e){}
+
     }
 
     if(addedWords) {
         addedWords = JSON.parse(addedWords);
-        changeWordsWithAddWords();
     }
-
     else addedWords = [];
     if(deletedWords) {
         deletedWords = JSON.parse(deletedWords);
-        changeWordsWithDeletedWords();
     }
     else deletedWords = [];
-
+    changeWordsDictionary();
     function sortWords(){
         words = words.sort((a,b) => a.localeCompare(b));
     }
@@ -367,14 +372,18 @@ window.onload = function(){
             },
             deleteWord(word){
                 word = word.toLowerCase();
-                console.log('del word');
+                console.log('del word ', this.inputAddSelected);
                 if(this.inputAddSelected){
-                    this.addedWords =  deleteWordFromArray(word, this.addedWords);
+                    addedWords = deleteWordFromArray(word, this.addedWords);
+                    this.addedWords = addedWords;
+                    setToStorage('addedWords', JSON.stringify(this.addedWords));
 
                 } else{
-                    this.deletedWords =  deleteWordFromArray(word, this.deletedWords);
+                    deletedWords = deleteWordFromArray(word, this.deletedWords);
+                    this.deletedWords =  deletedWords
+                    setToStorage('deletedWords', JSON.stringify(this.deletedWords));
                 }
-                setToStorage('addedWords', JSON.stringify(this.addedWords));
+                changeWordsDictionary();
                 saveData();
             },
             addWordToAdded(){
@@ -385,7 +394,7 @@ window.onload = function(){
                 }
                 this.dictInput = '';
                 addedWords = this.addedWords;
-                changeWordsWithAddWords();
+                changeWordsDictionary();
                 setToStorage('addedWords', JSON.stringify(this.addedWords));
                 saveData();
             },
@@ -397,7 +406,7 @@ window.onload = function(){
                 }
                 this.dictInput = '';
                 deletedWords = this.deletedWords;
-                changeWordsWithDeletedWords();
+                changeWordsDictionary();
                 setToStorage('deletedWords', JSON.stringify(this.deletedWords));
                 saveData();
             },
